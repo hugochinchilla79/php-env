@@ -1,0 +1,38 @@
+version: '3'
+networks:
+  admin_network:
+    ipam:
+      config:
+        - subnet: 172.36.0.0/24
+  pg_network:
+    name: pg_network
+    external: true
+  admin_ext_network:
+    name: 'admin_ext_network'
+    driver: bridge
+services:
+  admin_pagadito:
+    container_name: admin_pagadito
+    build:
+      context: .
+      dockerfile: Dockerfile
+    ports:
+      - "7075:80"
+    volumes:
+      - ./src:/var/www/html/
+      - ./certs/pagadito.crt:/etc/ssl/certs/pagadito.crt
+      - ./certs/pagadito.key:/etc/ssl/private/pagadito.key
+      - ./virtualhosts/000-default.conf:/etc/apache2/sites-available/000-default.conf
+      - ./virtualhosts/default-ssl.conf:/etc/apache2/sites-available/default-ssl.conf
+      - ${CONFIG_DIRECTORY}:/etc/config/
+    extra_hosts:
+      - "www.pagadito.com:172.29.0.3"
+      - "gitlab.pagadito.com:192.168.0.20"
+      - "host.docker.internal:host-gateway"
+    networks:
+      admin_network:
+        ipv4_address: 172.36.0.2
+      pg_network:
+      admin_ext_network:
+
+    
