@@ -13,6 +13,7 @@ networks:
 services:
   admin_pagadito:
     container_name: admin_pagadito
+    restart: always
     build:
       context: .
       dockerfile: Dockerfile
